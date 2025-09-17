@@ -1,3 +1,87 @@
+# Proyecto React - Rick & Morty
+
+Autor: **Alejandro Muñoz**
+
+
+
+## Cómo construir y desplegar con Docker y GitHub Actions
+
+### 1. Construir la imagen Docker
+
+El proyecto incluye un `Dockerfile` multi-stage para construir y servir la aplicación con Nginx.
+
+**Pasos para construir la imagen localmente:**
+
+```bash
+docker build -t <tu_usuario_dockerhub>/ricky-morty-test:latest .
+```
+
+**Para correr el contenedor:**
+
+```bash
+docker run -p 80:80 <tu_usuario_dockerhub>/ricky-morty-test:latest
+```
+
+---
+
+### 2. Automatización con GitHub Actions
+
+El flujo de trabajo (`.github/workflows/docker-image.yml`) construye y sube la imagen a Docker Hub automáticamente al hacer push a la rama `main`.
+
+#### Pasos del workflow:
+
+1. **Checkout**
+   - Descarga el código fuente del repositorio.
+   ```yaml
+   - name: Checkout code
+     uses: actions/checkout@v3
+   ```
+
+2. **Docker set up buildx**
+   - Configura Docker Buildx para builds avanzados y multiplataforma.
+   ```yaml
+   - name: Set up Docker Buildx
+     uses: docker/setup-buildx-action@v3
+   ```
+
+3. **Docker login**
+   - Inicia sesión en Docker Hub usando secretos de GitHub (`DOCKER_USERNAME` y `DOCKER_PASSWORD`).
+   ```yaml
+   - name: Log in to DockerHub
+     uses: docker/login-action@v3
+     with:
+       username: ${{ secrets.DOCKER_USERNAME }}
+       password: ${{ secrets.DOCKER_PASSWORD }}
+   ```
+
+4. **Docker Build and push**
+   - Construye la imagen y la sube a Docker Hub.
+   ```yaml
+   - name: Build and push Docker image
+     uses: docker/build-push-action@v5
+     with:
+       context: .
+       push: true
+       tags: ${{ secrets.DOCKER_USERNAME }}/ricky-morty-test:latest
+   ```
+
+#### Notas importantes
+
+- Debes crear los secretos `DOCKER_USERNAME` y `DOCKER_PASSWORD` en la configuración de tu repositorio en GitHub (Settings > Secrets and variables > Actions).
+- El repositorio de Docker Hub debe existir y tu usuario debe tener permisos de push.
+
+---
+
+## Scripts disponibles
+
+- `npm start` - Ejecuta la app en modo desarrollo.
+- `npm test` - Ejecuta los tests.
+- `npm run build` - Construye la app para producción.
+
+---
+
+
+
 # Getting Started with Create React App
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
